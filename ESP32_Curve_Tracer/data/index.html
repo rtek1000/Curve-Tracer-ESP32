@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP32CT</title>
+        <link rel="icon" href="data:,">
+        <style>
+            body { background-color: #000000; }
+        </style>
+    </head>
+    <body style="color:#ffffff";>
+        <p style="color:#ffffff";>ESP32CT - ESP32 Curve Tracer - Fault locator for electronic circuits, comparing V.I. curves (voltage and current)</p>
+         <table>
+          <tr>
+            <th>
+                <canvas id="myCanvas1" width="480" height="480" style="border:1px solid #c3c3c3; style="color:#c3c3c3";">Your browser does not support the canvas element.</canvas>
+            </th>
+            <th>
+                <canvas id="myCanvas2" width="480" height="480" style="border:1px solid #c3c3c3; style="color:#c3c3c3";">Your browser does not support the canvas element.</canvas>
+            </th>
+            <th>
+                <form name="myForm1" action="" method="GET" id="form1">
+                    <fieldset id="fieldset1">
+                        <legend id="legfieldset1">Operating mode: CH1 x CH2</legend>
+                        <input type="button" name="button1a" value="CH1 x CH2" onClick="testResults1a(this.form)">
+                        <input type="button" name="button1b" value="CH1 x File" onClick="testResults1b(this.form)">
+                        <input type="button" name="button1c" value="File edit" onClick="testResults1c(this.form)">
+                    </fieldset>
+                </form>
+                <p></p>
+                <form name="myForm2" action="" method="GET" id="form2">
+                    <fieldset id="fieldset2" disabled>
+                        <legend>File</legend>
+                        <div>
+                            <p>Name:</p>
+                            <input type="text" id="filename" name="name1" size="30">
+                        </div>
+
+                        <div>
+                            <p>Description:</p>
+                            <input type="text" id="filedesc" name="desc1" size="30">
+                        </div>
+
+                        <div>
+                            <p></p>
+                            <label>Max pins:</label>
+                            <input type="tel" id="pin_qty" name="pins" size="3">
+                            <input type="button" id="btnSetMaxPins" name="btnSetMaxPins1" value="Set" onClick="testResults9(this.form)" disabled>
+                        </div>
+                        <div>
+                            <p id="pin_curr" name="curr_pin1">Next pin: 0</p>
+                        </div>
+                        <input type="button" id="btn_prev" name="btn_prev1" value="Prev" onClick="testResults2(this.form)" disabled>
+                        <input type="button" id="btn_hold" name="btn_hold1" value="Hold" onClick="testResults6(this.form)" disabled>
+                        <input type="button" id="btn_next" name="btn_next1" value="Next" onClick="testResults3(this.form)" disabled>
+                        <input type="button" id="btn_load" name="btn_load1" value="Load" onClick="testResults4(this.form)" disabled>
+                        <input type="button" id="btn_save" name="btn_save1" value="Save" onClick="testResults5(this.form)" disabled>
+                    </fieldset>
+                </form>
+                <p></p>
+                <form name="myForm3" action="" method="GET" id="form3">
+                    <fieldset id="fieldset3">
+                        <legend id="ch1_relay">CH1 Relay:</legend>
+                        <label>Max relays:</label>
+                        <input type="tel" id="relay_qty" name="relays" size="3">
+                        <input type="button" id="btnSetMaxRelays" name="btnSetMaxRelays1" value="Set" onClick="testResults11(this.form)">
+                        <br>
+                        <input type="button" id="relay_on" name="button10a" value="On" onClick="testResults10a(this.form)">
+                        <input type="button" id="relay_off" name="button10b" value="Off" onClick="testResults10b(this.form)">
+                        <input type="button" id="relay_prev" name="button10c" value="Prev" onClick="testResults10c(this.form)">
+                        <input type="button" id="relay_next" name="button10d" value="Next" onClick="testResults10d(this.form)">
+                        <input type="checkbox" id="relay_sync" name="button10e" value="Sync" onchange="testResults10e(this)">
+                        <label id="lbl_checkbox">Sync</label>
+                    </fieldset>
+                </form>
+            </th>
+          </tr>
+          <tr>
+            <th>
+                <table>
+                  <tr>
+                    <th>
+                        <label>CH1:</label>
+                        <input type="color" id="ch1color" name="ch1col" value="#e5a50a">
+                    </th>
+                    <th>
+                        <label id="lblch2color">CH2:</label>
+                        <input type="color" id="ch2color" name="ch2col" value="#c01c28">
+                    </th>
+                    <th>
+                        <label id="diff"></label>
+                    </th>
+                  </tr>
+                </table>
+            </th>
+            <th>
+                <input type="button" id="btnLoadImage" name="btnLoadImage1" value="Load image" onClick="testResults8(this.form)" disabled>
+                <p id="lblLoadImage">No file selected</p>
+            </th>
+            <th>
+            </th>
+          </tr>
+        </table>
+                <form name="myForm3" action="" method="GET">
+                    <fieldset>
+                        <legend>Log</legend>
+                        <div>
+                            <p id="log_text"></p>
+                        </div>
+                    </fieldset>
+                    <input type="button" name="button6" value="Clear" onClick="testResults7(this.form)">
+                </form>
+        <script> 
+            var webSocket1;
+            
+            var i;
+            
+            var remote_data_x = [65];
+            var remote_data_y = [65];
+            var remote_data_z = [65];
+            
+            var remote_data_x0 = [65];
+            var remote_data_y0 = [65];
+            var remote_data_z0 = [65];
+            
+            var remote_data_x1 = [65];
+            var remote_data_y1 = [65];
+            var remote_data_z1 = [65];
+            
+            var remote_data_state = 0;
+            
+            var hold_data_x = [65];
+            var hold_data_y = [65];
+            
+            var flag_capture_data = false;
+            
+            var diff_percent = 0.0;
+            var diff_percent_prev = 0.0;
+
+            var point1_x1 = [];
+            var point1_y1 = [];
+            
+            var point1_x2 = [];
+            var point1_y2 = [];
+
+            var point2_x2 = [];
+            var point2_y2 = [];
+            
+            var ch1_vs_ch2 = true;
+            var ch1_vs_file = false;
+            var file_edit = false;
+            var show_file_pin = false;
+            
+            var current_pin1 = 1;
+            var hold_pin1 = 1;
+            var pin_count1 = 0;
+            var max_pin_count1 = 1;
+            
+            var current_update_status = 0;
+            
+            const update_status_curr = 0
+            const update_status_held = 1
+            const update_status_all = 2
+            const update_status_hide = 3
+            
+            var data_loaded = false;
+            
+            var ch1_relay1 = 0;
+            var ch1_relay_max = 0;
+            
+            var canvas1 = document.getElementById("myCanvas1");
+            var canvas2 = document.getElementById("myCanvas2");
+            
+            function log1 (text) { // append text log
+                let str1 = "";
+                str1 = document.getElementById('log_text').textContent;
+                str1 = str1 + text; //.substring(0, 80);
+                document.getElementById('log_text').textContent = str1;
+            }
+            
+            function clear_log1 () { // clear text log
+                document.getElementById('log_text').textContent = "";
+            }
+            
+            //function update_curr_pin(val) {
+            //    document.getElementById('pin_curr').textContent = "Current pin: "
+            //        + val.toString();
+            //    current_update_status = 1;
+            //}
+            
+            function update_curr_hold_pin(curr_val, next_val) {
+                document.getElementById('pin_curr').textContent = "Current pin: "
+                    + curr_val.toString() + " (Hold: " + next_val.toString() + ")";
+                current_update_status = update_status_curr;
+            }
+            
+            function update_held_pin(val) {
+                document.getElementById('pin_curr').textContent = "Held pin: " + val.toString();
+                current_update_status = update_status_held;
+            }
+            
+            //function update_next_pin(val) {
+            //    document.getElementById('pin_curr').textContent = "Next pin: " + val.toString();
+            //    current_update_status = update_status_next;
+            //}
+            
+            function update_complete_pin() {
+                document.getElementById('pin_curr').textContent = "All (" +
+                    point2_x2.length.toString() + ") pin held";
+                current_update_status = update_status_all;
+            }
+            
+            function update_hide_pin() {
+                document.getElementById('pin_curr').textContent = "";
+                current_update_status = update_status_hide;
+            }
+            
+            function initElements() {    
+                current_pin1 = 1;
+                hold_pin1 = 1;
+                update_curr_hold_pin(current_pin1, hold_pin1);
+
+                document.getElementById('filename').value = "esp32ct.ctf"
+                document.getElementById('filedesc').value = "IC test"
+                document.getElementById('pin_qty').value = "1";
+                log1("Page loaded; ");
+                
+                graphRefresh2('panel_disabled'); //load image
+                    
+                document.getElementById("fieldset2").disabled = true;
+                
+                document.getElementById("filename").disabled = true;
+                document.getElementById("filedesc").disabled = true;
+                document.getElementById("pin_qty").disabled = true;
+                 
+                document.getElementById("btn_prev").disabled = true;
+                document.getElementById("btn_hold").disabled = true;
+                document.getElementById("btn_next").disabled = true;
+                document.getElementById("btn_load").disabled = true;
+                document.getElementById("btn_save").disabled = true;
+                
+                testResults1a(0);
+            }
+            
+            initElements();
+            
+            function detectMobile() {
+                let isMobile = window.matchMedia("(any-pointer:coarse)").matches;
+                
+                if (isMobile == true) {
+                    alert("Mobile device detected");
+                }
+            }
+            
+            detectMobile();
+            
+            function InitWebSocket() {
+                let calc_diff;
+                     
+                webSocket1 = new WebSocket('ws://'+window.location.hostname+':88/');
+
+                webSocket1.onmessage = function(evt) {
+                    JSONobj = JSON.parse(evt.data);
+                    
+                    calc_diff = 0.0;
+                    
+                    if (remote_data_state == 0) {
+                        for(let i = 0; i < 65; i++) {
+                            remote_data_x0[i] = JSONobj.val_x[i] / 1000;
+                            remote_data_y0[i] = JSONobj.val_y[i] / 1000;
+                            remote_data_z0[i] = JSONobj.val_z[i] / 1000;
+                        }
+                    
+                        remote_data_state = 1;
+                    } else if (remote_data_state == 1) {
+                        for(let i = 0; i < 65; i++) {
+                            remote_data_x1[i] = JSONobj.val_x[i] / 1000;
+                            remote_data_y1[i] = JSONobj.val_y[i] / 1000;
+                            remote_data_z1[i] = JSONobj.val_z[i] / 1000;
+                        }
+                        
+                        for(let i = 0; i < 65; i++) {
+                            remote_data_x[i] = (remote_data_x0[i] + remote_data_x1[i]) / 2;
+                            remote_data_y[i] = (remote_data_y0[i] + remote_data_y1[i]) / 2;
+                            remote_data_z[i] = (remote_data_z0[i] + remote_data_z1[i]) / 2;
+                        }
+
+                        remote_data_state = 0;
+                    } else {
+                        remote_data_state = 0;
+                    }                
+                    
+                    let srv_relay = parseInt(JSONobj.srv_relay);
+                    
+                    let srv_relay_max = parseInt(JSONobj.srv_relay_max);
+                    
+                    ch1_relay_max = srv_relay_max;
+                    
+                    document.getElementById('relay_qty').value = ch1_relay_max;
+                    
+                    if (srv_relay == 0) {
+                        document.getElementById("ch1_relay").innerText = "CH1 Relay: Off";
+                    } else if (srv_relay > 0) {
+                        document.getElementById("ch1_relay").innerText = "CH1 Relay: "
+                            + srv_relay + " (Max: " + srv_relay_max + ")";
+                    }
+                    
+                    graphRefresh1();
+                }
+                
+                webSocket1.onopen = () => {
+                    log1("Websocket connection established; ")
+                }
+                
+                webSocket1.onclose = () => {
+                    log1("Websocket connection closed; ");
+                }
+                
+                webSocket1.onerror = error => {
+                    log1(error + "; ");
+                }
+            }
+            
+            InitWebSocket();
+            
+            function graphRefresh1() {
+                let calc_diff = 0.0;
+                let flag_save = flag_capture_data;
+                let p2_x = [];
+                let p2_y = [];
+                let p2_x2 = [];
+                let p2_y2 = [];
+                let off_set1 = 0;
+                let off_set2 = 20;
+                
+                for (i = 0; i < 65; i++) {
+                    if (flag_save == true) {
+                        hold_data_x[i] = remote_data_x[i] * 1000;
+                        hold_data_y[i] = remote_data_y[i] * 1000;
+                    }
+                    
+                    point1_x1[i] = ((remote_data_x[i] - remote_data_y[i]) * canvas1.width) + (canvas1.width / 2) + off_set1;
+                    point1_y1[i] = remote_data_y[i] * canvas1.height + off_set2;
+                            
+                    point1_x2[i] = ((remote_data_x[i] - remote_data_z[i]) * canvas1.width) + (canvas1.width / 2) + off_set1;
+                    point1_y2[i] = remote_data_z[i] * canvas1.height + off_set2;
+                    
+                    if (ch1_vs_ch2 == true) {
+                        if (1 > (remote_data_y[i] / remote_data_z[i])) {
+                            calc_diff += 1 - (remote_data_y[i] / remote_data_z[i]);
+                        } else {
+                            calc_diff += 1 - (remote_data_z[i] / remote_data_y[i]);
+                        }
+                    } else {
+                        if (data_loaded == true) {
+                            if (point2_x2[current_pin1 - 1] !== undefined && point2_x2[current_pin1 - 1] !== null) {
+                                p2_x[i] = point2_x2[current_pin1 - 1][i] / 1000;
+                                p2_y[i] = point2_y2[current_pin1 - 1][i] / 1000;
+                            }
+                        } else {
+                            p2_x[i] = point1_x1[i];
+                            p2_y[i] = point1_y1[i];
+                        }
+                        
+                        p2_x2[i] = ((p2_x[i] - p2_y[i]) * canvas1.width) + (canvas1.width / 2) + off_set1;
+                        p2_y2[i] = p2_y[i] * canvas1.height + off_set2;
+                        
+                        if (1 > (remote_data_y[i] / p2_y[i])) {
+                            calc_diff += (1 - (remote_data_y[i] / p2_y[i])) * 2;
+                        } else {
+                            calc_diff += (1 - (p2_y[i] / remote_data_y[i])) * 2;
+                        }
+                    }
+                }
+                
+                if (flag_save == true) {
+                    flag_save = false;
+                    
+                    flag_capture_data = false;
+                }
+                
+                if (ch1_vs_ch2 == true) {
+                    diff_percent = calc_diff * 1.892 * 2; // to fit in the 0-100 range
+                } else if (show_file_pin == true) {    
+                    diff_percent = calc_diff * 1.892; // to fit in the 0-100 range
+                }
+                                
+                let diff_p = (diff_percent + diff_percent_prev) / 2.0;
+                
+                diff_percent_prev = diff_percent;
+                
+                diff_p = (diff_p).toFixed(1);
+                
+                if (diff_p > 99.9) {
+                    diff_p = 100;
+                }
+                 
+                document.getElementById("diff").textContent = " (Diff: " + diff_p + "%)";
+
+                let ctx = canvas1.getContext("2d");
+                
+                ctx.clearRect(0, 0, canvas1.width, canvas1.height);
+                ctx.stroke();
+                
+                let ch1color = document.getElementById("ch1color").value;
+                let ch2color = document.getElementById("ch2color").value;
+                
+                for (i = 1; i < 6; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo((canvas1.width / 6) * i, 0);
+                    ctx.lineTo((canvas1.width / 6) * i, canvas1.height);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#4e4e4e";
+                    ctx.stroke();
+                        
+                    ctx.beginPath();
+                    ctx.moveTo(0, (canvas1.height / 6) * i);
+                    ctx.lineTo(canvas1.width, (canvas1.height / 6) * i);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#4e4e4e";
+                    ctx.stroke();
+                }
+                
+                for (i = 0; i < 63; i++) {
+                    // trace 1:                   
+                    ctx.beginPath();
+                    ctx.moveTo(point1_x1[i], point1_y1[i]);
+                    ctx.lineTo(point1_x1[i + 1], point1_y1[i + 1]);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = ch1color;
+                    ctx.stroke();
+                    
+                    if (ch1_vs_ch2 == true) {
+                        // trace 2:                                    
+                        ctx.beginPath();
+                        ctx.moveTo(point1_x2[i], point1_y2[i]);
+                        ctx.lineTo(point1_x2[i + 1], point1_y2[i + 1]);
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = ch2color;
+                        ctx.stroke();
+                    } else if (show_file_pin == true) {
+                        // trace 2:
+                        ctx.beginPath();
+                        ctx.moveTo(p2_x2[i], p2_y2[i]);
+                        ctx.lineTo(p2_x2[i + 1], p2_y2[i + 1]);
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = ch2color;
+                        ctx.stroke();
+                    }                    
+                }            
+            }
+            
+            graphRefresh1(); // load grid
+
+            function graphRefresh2(imgSrc) {                            
+                let ctx = canvas2.getContext("2d");
+                let img1 = new Image();
+                
+                //drawing of the image - img1
+                img1.onload = function () {
+                    //draw background image
+                    ctx.drawImage(img1, 0, 0);
+                };
+
+                img1.src = imgSrc;
+                
+                //ctx.clearRect(0, 0, canvas2.width, canvas2.height);
+                //ctx.stroke();
+            }
+            
+            // graphRefresh2('panel_disabled'); //load image
+            
+            function timedRefresh(timeoutPeriod) {
+                setTimeout("location.reload(true);",timeoutPeriod);
+            }
+            
+            function beep() {
+                let snd = new Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
+                snd.play();
+            }
+            
+            function sleep(milliseconds) {
+                const date = Date.now();
+                let currentDate = null;
+                do {
+                    currentDate = Date.now();
+                } while (currentDate - date < milliseconds);
+            }
+            
+            function readImage(input) {
+              const canvas = document.getElementById('myCanvas2');
+              const context = canvas.getContext("2d");
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              let imgSrc = '';
+              if (input.value !== '') {
+                imgSrc = window.URL.createObjectURL(input.files[0]);
+              }
+              const img = new Image();
+              img.onload = function() {
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+              }
+              img.src = imgSrc;
+            }
+            
+            function testResults1a (form) {
+                ch1_vs_ch2 = true;
+                ch1_vs_file = false;
+                file_edit = false;
+                show_file_pin = false;                
+                data_loaded = false;
+                
+                document.getElementById('legfieldset1').textContent = "Operating mode: CH1 x CH2";
+                
+                document.getElementById("lblch2color").innerText = "CH2:"; 
+                    
+                graphRefresh2('panel_disabled'); //load image
+                    
+                document.getElementById("btnLoadImage").disabled = true;
+                document.getElementById('lblLoadImage').textContent = "No file selected";
+                    
+                document.getElementById("fieldset2").disabled = true;
+                  
+                document.getElementById("filename").disabled = true;
+                document.getElementById("filedesc").disabled = true;
+                document.getElementById("pin_qty").disabled = true;
+                document.getElementById("btnSetMaxPins").disabled = true;
+  
+                document.getElementById("btn_prev").disabled = true;
+                document.getElementById("btn_hold").disabled = true;
+                document.getElementById("btn_next").disabled = true;
+                document.getElementById("btn_load").disabled = true;
+                document.getElementById("btn_save").disabled = true;
+                
+                document.getElementById('relay_qty').value = ch1_relay_max;
+                
+                update_hide_pin();
+            }
+
+            function testResults1b (form) {
+                ch1_vs_ch2 = false;
+                ch1_vs_file = true;
+                file_edit = false;
+                show_file_pin = false;
+                data_loaded = false;
+                    
+                point2_x2 = [];
+                point2_y2 = [];
+                
+                document.getElementById('legfieldset1').textContent = "Operating mode: CH1 x File";
+                    
+                document.getElementById("diff").textContent = " (Diff: x%)";
+                
+                document.getElementById("lblch2color").innerText = "File:"; 
+                    
+                graphRefresh2('panel'); //load image
+                    
+                document.getElementById("btnLoadImage").disabled = true;
+                document.getElementById('lblLoadImage').textContent = "Default image";
+                    
+                document.getElementById("fieldset2").disabled = false;
+                    
+                document.getElementById("filename").disabled = true;
+                document.getElementById("filedesc").disabled = true;
+                document.getElementById("pin_qty").disabled = true;
+                document.getElementById("btnSetMaxPins").disabled = true;
+                    
+                document.getElementById("btn_prev").disabled = true;
+                document.getElementById("btn_hold").disabled = true;
+                document.getElementById("btn_next").disabled = true;
+                document.getElementById("btn_load").disabled = false;
+                document.getElementById("btn_save").disabled = true;
+                
+                document.getElementById('relay_qty').value = ch1_relay_max;
+                
+                current_pin1 = 1;
+                hold_pin1 = 1;
+                update_curr_hold_pin(current_pin1, hold_pin1);
+            }
+            
+            function testResults1c (form) {
+                ch1_vs_ch2 = false;
+                ch1_vs_file = false;
+                file_edit = true;
+                data_loaded = false;
+                    
+                show_file_pin = false;
+                
+                document.getElementById('legfieldset1').textContent = "Operating mode: File edit (create)";
+                    
+                document.getElementById('filename').value = "esp32ct.ctf"
+                document.getElementById('filedesc').value = "IC test"
+                document.getElementById('pin_qty').value = "1";
+                max_pin_count1 = 1;
+                    
+                document.getElementById("diff").textContent = " (Diff: x%)";
+                
+                document.getElementById("lblch2color").innerText = "File:"; 
+                    
+                graphRefresh2('panel'); //load image
+                    
+                document.getElementById("btnLoadImage").disabled = false;
+                document.getElementById('lblLoadImage').textContent = "Default image";
+                    
+                document.getElementById("fieldset2").disabled = false;
+                    
+                document.getElementById("filename").disabled = false;
+                document.getElementById("filedesc").disabled = false;
+                document.getElementById("pin_qty").disabled = false;
+                document.getElementById("btnSetMaxPins").disabled = false;
+                    
+                document.getElementById("btn_prev").disabled = false;
+                document.getElementById("btn_hold").disabled = false;
+                document.getElementById("btn_next").disabled = false;
+                document.getElementById("btn_load").disabled = false;
+                document.getElementById("btn_save").disabled = false;
+                
+                document.getElementById('relay_qty').value = ch1_relay_max;
+                
+                current_pin1 = 1;
+                hold_pin1 = 1;
+                update_curr_hold_pin(current_pin1, hold_pin1);
+            }
+            
+            function testResults2 (form) { // prev
+                if (max_pin_count1 > 0) {
+                    if (current_pin1 > 1) {
+                        if (current_update_status == update_status_all) {
+                            current_pin1 = max_pin_count1;
+                        } else if(current_update_status != update_status_held) {
+                            if (hold_pin1 == current_pin1) {
+                                --current_pin1;
+                            }
+                        } else {
+                            current_pin1 = hold_pin1 - 1;
+                        }
+                    }
+                    
+                    hold_pin1 = current_pin1;
+                    update_curr_hold_pin(current_pin1, hold_pin1);
+                    
+                    document.getElementById("btn_hold").disabled = false;
+
+                    show_file_pin = true;
+                }
+            }
+            
+            function testResults3 (form) { // next
+                if(max_pin_count1 > 0){
+                    if(file_edit == true) {
+                        if(current_pin1 < max_pin_count1) {
+                            if (current_pin1 < point2_x2.length) {
+                                ++current_pin1;
+                                hold_pin1 = current_pin1;
+                            } else if (current_pin1 == point2_x2.length) {
+                                hold_pin1 = current_pin1 + 1;
+                            }
+                            
+                            update_curr_hold_pin(current_pin1, hold_pin1);
+                        } else {
+                            if (point2_x2.length == max_pin_count1) {
+                                update_complete_pin();
+                            
+                                document.getElementById("btn_hold").disabled = true;
+                            }
+                        }
+                    } else {
+                        if(current_pin1 < max_pin_count1) {
+                            ++current_pin1;
+                            update_curr_hold_pin(current_pin1, hold_pin1);
+                        }
+                    }
+                    
+                    show_file_pin = true;
+                }
+            }
+
+            function testResults4 (form) { // load
+                log1("Load file; ");              
+                let input = document.createElement("input");
+                input.type = "file";
+                input.setAttribute("multiple", false);
+                input.setAttribute("accept", ".ctf"); // accept=".ctf" 
+                input.onchange = function (event) {
+                    const fr = new FileReader();
+
+                    fr.addEventListener("load", e => {
+                        //console.log(e.target.result, JSON.parse(fr.result))
+                        JSONobj=JSON.parse(fr.result);
+                        
+                        //alert(JSONobj.remote_data_x[0][0]);
+                        
+                        document.getElementById('filedesc').value = JSONobj.file_desc;
+                        
+                        if (max_pin_count1 > 0) {
+                            current_pin1 = 1;       
+                            update_curr_hold_pin(current_pin1, hold_pin1);
+                        }
+
+                        //alert(JSONobj.file_desc); 
+                        
+                        let strDataURI = JSONobj.image;
+                        
+                        let canvas = document.getElementById('myCanvas2');
+                        let ctx = canvas.getContext('2d');
+                        let img = new Image;
+                        
+                        img.onload = function(){
+                          ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Or at whatever offset you like
+                        };
+                        
+                        img.src = strDataURI;
+                        
+                        document.getElementById('lblLoadImage').textContent = JSONobj.image_filename;
+                        
+                        point2_x2 = JSONobj.data_x;
+                        point2_y2 = JSONobj.data_y;
+                        
+                        //alert(point2_x2[0]);
+                        
+                        pin_count1 = point2_x2.length;
+                        
+                        document.getElementById('pin_qty').value = point2_x2.length;
+                        max_pin_count1 = point2_x2.length;
+                        
+                        show_file_pin = true;
+                        data_loaded = true;
+                        
+                        document.getElementById("btn_prev").disabled = false;
+                        document.getElementById("btn_next").disabled = false;
+                    });
+
+                    //fr.readAsText(blob);
+                    
+                    fr.readAsText(this.files[0]);
+                    
+                    document.getElementById('filename').value = this.files[0].name;
+                    
+                    const path = (window.URL || window.webkitURL).createObjectURL(this.files[0]);
+                };
+                input.click();
+            }
+            
+            function testResults5 (form) { // save
+                log1("Save file; ");
+                if (document.getElementById('filename').value == "") {
+                    log1("Filename empty (suggested name: esp32ct.ctf); ");
+                    document.getElementById('filename').value = "esp32ct.ctf"
+                    return;
+                }
+                
+                if (max_pin_count1 < 1) {
+                    log1("Max pins below minimum (1); ");
+                    
+                    return;
+                }
+                                
+                if (pin_count1 != max_pin_count1) {
+                    if (max_pin_count1 == 1) {
+                        log1("Held pin below: " + max_pin_count1.toString() + "; ");
+                    } else {
+                        log1("Held pins below: " + max_pin_count1.toString() + "; ");
+                    }
+                    
+                    return;
+                }
+                
+                let canvas2 = document.getElementById("myCanvas2");
+                
+                let imageURI = canvas2.toDataURL("image/png"); // toDataURL
+                
+                //alert(imageURI);
+                
+                let file_desc1 = document.getElementById('filedesc').value;
+                let image_filename1 = document.getElementById('lblLoadImage').textContent;
+                
+                let data_1 = {} // create object
+                    
+                data_1["image"] = imageURI;
+                data_1["image_filename"] = image_filename1;
+                data_1["file_desc"] = file_desc1;
+                data_1["max_pins"] = max_pin_count1;
+                data_1["data_x"] = point2_x2;
+                data_1["data_y"] = point2_y2;
+                    
+                //alert(imageURI);
+                
+                let body1 = document.body;
+                let json_payload = JSON.stringify(data_1, null, 1); //.replace(/(\r\n|\n|\r)/gm, "");
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(new Blob([json_payload], {
+                    type: "application/cft"
+                }));
+                a.setAttribute("download", document.getElementById('filename').value);
+                body1.appendChild(a);
+                a.click();
+                body1.removeChild(a);
+            }
+            
+            function testResults6 (form) { // hold
+                //if ((current_pin1 > 0) | (file_edit == true)) {
+                    clear_log1();
+                    
+                    flag_capture_data = true;
+                
+                    let timeout = 0;
+                    
+                    while (flag_capture_data == true) {
+                        graphRefresh1();
+
+                        sleep(5);
+                        
+                        if (timeout > 200) {
+                            log1("Hold timeout; ");
+                            return;
+                        } else {
+                            ++timeout;
+                        }
+                    }
+                
+                    if (pin_count1 < current_pin1) {
+                        pin_count1 = current_pin1;
+                    }
+                    
+                    if (hold_pin1 <= max_pin_count1) {
+                        current_pin1 = hold_pin1;
+                    }
+                    
+                    update_held_pin(current_pin1);
+                    
+                    log1('Hold pin' + current_pin1.toString() + ': ');
+                    
+                    let str_x = [65];
+                    let str_y = [65];
+                    
+                    for (i = 0; i < 65; i++) {
+                        log1('[' + parseInt(hold_data_x[i]).toString() + ',' + parseInt(hold_data_y[i]).toString() + ']');
+                        
+                        str_x[i] = parseInt(hold_data_x[i]);
+                        str_y[i] = parseInt(hold_data_y[i]);
+                        
+                        if (i < 64) {
+                            log1(', ');
+                        }
+                    }
+                    
+                    log1('; ');
+                    
+                    if (point2_x2.length > max_pin_count1) {
+                        point2_x2.length = max_pin_count1;
+                    }
+                    
+                    if(point2_x2.length >= current_pin1) {
+                        point2_x2[current_pin1 - 1] = str_x;
+                        point2_y2[current_pin1 - 1] = str_y;
+                    } else {
+                        point2_x2.push(str_x);
+                        point2_y2.push(str_y);
+                    }
+                    
+                    //alert(point2_y2.length);
+                                                            
+                    show_file_pin = true;
+                    
+                    data_loaded = true;
+                    
+                    timer1.reset();
+                    timer1.resume();
+                    
+                    
+                //} else {
+                //    show_file_pin = false;
+                //}
+            }
+
+            function testResults7 (form) { // clear log
+                clear_log1();
+            }
+            
+            function testResults8 (form) { // load image
+                let input = document.createElement("input");
+                input.type = "file";
+                input.value = '';
+                input.setAttribute("multiple", false);
+                input.setAttribute("accept", "image/png, image/jpeg"); // accept="image/png, image/jpeg"
+                input.onchange = function (event) {
+
+                      const canvas = document.getElementById('myCanvas2');
+                      const context = canvas.getContext("2d");
+                      context.clearRect(0, 0, canvas.width, canvas.height);
+                      let imgSrc = '';
+                      if (input.value !== '') {
+                        imgSrc = window.URL.createObjectURL(input.files[0]);
+                      }
+                      const img = new Image();
+                      img.onload = function() {
+                        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                      }
+                      img.src = imgSrc;
+                    
+                    document.getElementById('lblLoadImage').textContent = this.files[0].name;
+                    
+                    //const path = (window.URL || window.webkitURL).createObjectURL(this.files[0]);
+                };
+                input.click();
+            }
+            
+            function testResults9 (form) { // set max pins
+                let max_pins1 = parseInt(document.getElementById('pin_qty').value);
+                
+                if (point2_x2.length > max_pins1) {
+                    point2_x2.length = max_pins1;
+                    point2_y2.length = max_pins1;
+                    
+                    document.getElementById("btn_hold").disabled = true;
+                } else {
+                    document.getElementById("btn_hold").disabled = false;
+                }
+                
+                if (pin_count1 > max_pins1) {
+                    pin_count1 = max_pins1;
+                }
+                
+                if (current_pin1 < pin_count1) {
+                    current_pin1 = pin_count1;
+                }
+                
+                max_pin_count1 = max_pins1;
+                
+                if (current_pin1 < max_pin_count1) {
+                    if (current_pin1 >= point2_x2.length) {
+                        hold_pin1 = current_pin1;
+                    } else {
+                        hold_pin1 = current_pin1 + 1;
+                    }
+                } else {
+                    hold_pin1 = current_pin1;
+                }
+                
+                if (point2_x2.length == max_pins1) {
+                    update_complete_pin();
+                    
+                    document.getElementById("btn_hold").disabled = true;
+                } else if (point2_x2.length < max_pins1) {
+                    hold_pin1 = current_pin1 + 1;
+                    
+                    update_curr_hold_pin(current_pin1, hold_pin1);
+                } else {
+                    update_curr_hold_pin(current_pin1, hold_pin1);
+                }
+            }
+            
+            function testResults10a (form) { // on relay
+                ch1_relay1 = 1;
+                sendWebSocket();
+            }
+            
+            function testResults10b (form) { // off relay
+                ch1_relay1 = 0;
+                sendWebSocket();
+            }
+            
+            function testResults10c (form) { // prev relay
+                if (ch1_relay1 > 1) {
+                    ch1_relay1 = ch1_relay1 - 1;
+                }
+                sendWebSocket();
+            }
+          
+            function testResults10d (form) { // next relay
+                if (ch1_relay1 > 0) {
+                    ch1_relay1 = ch1_relay1 + 1;
+                }
+                sendWebSocket();
+            }
+            
+            function testResults10e (checkbox) { // sync relay
+                document.getElementById("relay_on").disabled = checkbox.checked;
+                document.getElementById("relay_off").disabled = checkbox.checked;
+                document.getElementById("relay_prev").disabled = checkbox.checked;
+                document.getElementById("relay_next").disabled = checkbox.checked;
+            }
+
+            function testResults11 (checkbox) { // set max relays
+                ch1_relay_max = parseInt(document.getElementById('relay_qty').value);
+                
+                if (ch1_relay_max > 63) {
+                    ch1_relay_max = 63;
+                }
+
+                sendWebSocket();
+            }
+
+            function sendWebSocket() {
+                let data_1 = {} // create object
+                data_1["client_relay"] = ch1_relay1;
+                data_1["client_relay_max"] = ch1_relay_max;
+                let json_payload = JSON.stringify(data_1, null, 1);
+                webSocket1.send(json_payload);
+            }
+          
+            function Timer(callback, delay) {
+              let timerId;
+              let start;
+              let remaining = delay;
+
+              this.pause = function () {
+                window.clearTimeout(timerId);
+                remaining -= new Date() - start;
+              };
+
+              let resume = function () {
+                start = new Date();
+                timerId = window.setTimeout(function () {
+                  remaining = delay;
+                  resume();
+                  callback();
+                }, remaining);
+              }
+              this.resume = resume;
+
+              this.reset = function () {
+                remaining = delay;
+              };
+            }
+            
+            var timer1 = new Timer(function () {
+                //console.log("Timeout!");
+                show_file_pin = false;
+
+                if (current_pin1 < max_pin_count1) {
+                    data_loaded = false;
+                    hold_pin1 = current_pin1 + 1;
+                    update_curr_hold_pin(current_pin1, hold_pin1);
+                    
+                    log1('Next pin' + hold_pin1.toString() + '; ');
+                } else {
+                   update_complete_pin();
+                   
+                   document.getElementById("btn_hold").disabled = true;
+                }
+                
+                timer1.pause();
+            }, 2000);
+        </script>
+    </body>
+</html>
