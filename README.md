@@ -33,7 +33,7 @@ Expansion of probes:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_pg2.png)
 
-Data upload to ESP32 (Webserver):
+Uploading the Data Folder to the ESP32 (Webserver):
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_upload.png)
 
