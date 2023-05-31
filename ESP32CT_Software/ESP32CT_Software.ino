@@ -18,9 +18,6 @@
 #include <WiFiClient.h>
 #include <WebServer.h>
 
-#include <TFT_eSPI.h> // Hardware-specific library
-#include <SPI.h>
-
 /* Pinout - begin */
 #define WM_TRIGGER_PIN 0
 
@@ -36,14 +33,6 @@
 #define HC595_SER   14
 #define HC595_RCLK  12
 #define HC595_SRCLK 13
-
-#define LCD_LED     27
-#define LCD_MISO    19 // need to un-comment (l:207) on file User_Setup.h
-#define LCD_MOSI    23 // need to un-comment (l:208) on file User_Setup.h
-#define LCD_SCLK    18 // need to un-comment (l:209) on file User_Setup.h
-#define LCD_CS      15 // need to comment (l:171)/un-comment (l:210) on file User_Setup.h
-#define LCD_DC      2  // need to comment (l:170)/un-comment (l:211) on file User_Setup.h
-#define LCD_RST     4  // need to comment (l:169)/un-comment (l:212) on file User_Setup.h
 
 /* Pinout - end */
 
@@ -93,8 +82,6 @@ void setup() {
   server_setup();
 
   curveTracer_setup();
-
-  display_setup();
 }
 
 void loop() {
@@ -117,33 +104,5 @@ void loop() {
   //
   //    set_hc595(0, loop_cn2);
   //  }
-
-//  if (updateTime <= millis()) {
-//    updateTime = millis() + LOOP_PERIOD;
-//
-//    d += 4; if (d >= 360) d = 0;
-//
-//    //value[0] = map(analogRead(A0), 0, 1023, 0, 100); // Test with value form Analogue 0
-//
-//    // Create a Sine wave for testing
-//    value[0] = 50 + 50 * sin((d + 0) * 0.0174532925);
-//    value[1] = 50 + 50 * sin((d + 60) * 0.0174532925);
-//    value[2] = 50 + 50 * sin((d + 120) * 0.0174532925);
-//    value[3] = 50 + 50 * sin((d + 180) * 0.0174532925);
-//    value[4] = 50 + 50 * sin((d + 240) * 0.0174532925);
-//    value[5] = 50 + 50 * sin((d + 300) * 0.0174532925);
-//
-//    //unsigned long t = millis();
-//
-//    plotPointer();
-//
-//    plotNeedle(ch_relay, 0); // value[0]
-//
-//    //Serial.println(millis()-t); // Print time taken for meter update
-//  }
-
-  screen_saver_Matrix();
-
-  // curveTracer_handle();
 
 }
