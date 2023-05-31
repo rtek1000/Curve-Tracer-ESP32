@@ -16,6 +16,10 @@ Note: Work in progress, just demonstrative, not functional, sorry.
 - Automatic/Manual test path selection
 - Multiple test impedances (x1, x2, x4, x8)
 
+HTML_page:
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/HTML_page.png)
+
 ### Hardware
 
 - Total 160 test tracks for each channel (Ch1: 160 probes, Ch2: 160 probes)
