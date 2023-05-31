@@ -3,6 +3,12 @@ Fault locator for electronic circuits, comparing V.I. curves (voltage and curren
 
 Operation based on this project: [Curve Tracer ATmega328](https://github.com/rtek1000/Curve-Tracer-ATmega328)
 
+------------
+
+Note: Work in progress, just demonstrative, not functional, sorry.
+
+------------
+
 ### Software
 
 - Visual interface via browser (HTML page)
@@ -22,3 +28,17 @@ Main:
 Expansion of probes:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_pg2.png)
+
+------------
+
+## Licence
+
+#### Hardware:
+Released under CERN OHL 1.2: https://ohwr.org/cernohl
+
+#### Software:
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
