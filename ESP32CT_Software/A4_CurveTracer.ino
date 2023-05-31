@@ -242,45 +242,91 @@ bool curveTracer_handle(void) {
   //  delayMicroseconds(2000);
 }
 
-bool hc595_buffer0 = 0;
+byte hc595_buffer0 = 0;
 byte hc595_buffer1 = 0;
 
-void set_relay_current(bool state) {
-  if (state == true) {
-    hc595_buffer0 = 1;
+void set_relay_current(byte state) {
+  if(state == 1) {
+    hc595_buffer0 = 0b1;
+  } else if(state == 2) {
+    hc595_buffer0 = 0b10;
   } else {
     hc595_buffer0 = 0;
   }
 
-  set_hc595(hc595_buffer0, hc595_buffer1);
+  set_hc595(hc595_buffer1, hc595_buffer0);
 }
 
 void set_relay_ch(byte state) {
   hc595_buffer1 = state;
 
-  set_hc595(hc595_buffer0, hc595_buffer1);
+  set_hc595(hc595_buffer1, hc595_buffer0);
 }
 
-void set_hc595(bool _dat0, byte _dat1) {
+void set_hc595(uint16_t _dat1, uint8_t bit01) {
+  uint8_t dat_en = 0;
+  uint8_t dat_s = 0;
   bool dat_test;
-  uint64_t dat_tmp = 0;
+  const uint8_t end_bits_en = 23;
+  const uint8_t start_bits_en = 6;
+  const uint8_t end_bits_s = 5;
+  const uint8_t start_bits_s = 2;
+  const uint8_t start_bits_01 = 1;
 
-  if(_dat1 > 0) {
-    //dat_tmp = (uint64_t)(((uint64_t)(1 << (_dat1 - 1)) << 1) + _dat0);
-    dat_tmp = _dat1 - 1;
-    dat_tmp = 1 << dat_tmp;
-    dat_tmp = dat_tmp << 1;
-    dat_tmp = (uint64_t)(dat_tmp | (uint64_t)_dat0);
-  } else {
-    dat_tmp = _dat0;
+  //  if (_dat1 < 100) {
+  //    Serial.print("0");
+  //  }
+  //
+  //  if (_dat1 < 10) {
+  //    Serial.print("0");
+  //  }
+
+  //  Serial.print(_dat1, DEC);
+  //  Serial.print(": ");
+
+  dat_en = (_dat1 / 16) + start_bits_en;
+
+  dat_s = (_dat1 % 16) << start_bits_s;
+
+  for (int i = end_bits_en; i >= start_bits_en; i--) {
+    if (i == dat_en) {
+      digitalWrite(HC595_SER, LOW); // /E
+      //      Serial.print("0");
+    } else {
+      digitalWrite(HC595_SER, HIGH); 
+      //      Serial.print("1");
+    }
+
+    //    if ((i % 8) == 0) {
+    //      Serial.print(" ");
+    //    }
+
+    digitalWrite(HC595_SRCLK, HIGH);
+    digitalWrite(HC595_SRCLK, LOW);
   }
 
-  for (int i = 63; i >= 0; i--) {
-    dat_test = (uint64_t)(dat_tmp >> i) & 1;
+  for (int i = end_bits_s; i >= start_bits_s; i--) {
+    dat_test = (dat_s >> i) & 1;
     if (dat_test == 1) {
-      digitalWrite(HC595_SER, HIGH);
+      digitalWrite(HC595_SER, HIGH); // S0-S3
+      //      Serial.print("1");
     } else {
       digitalWrite(HC595_SER, LOW);
+      //      Serial.print("0");
+    }
+
+    digitalWrite(HC595_SRCLK, HIGH);
+    digitalWrite(HC595_SRCLK, LOW);
+  }
+
+  for (int i = start_bits_01; i >= 0; i--) {
+    dat_test = (bit01 >> i) & 1;
+    if (dat_test == 1) {
+      digitalWrite(HC595_SER, HIGH); // A0; B0
+      //      Serial.print("1");
+    } else {
+      digitalWrite(HC595_SER, LOW);
+      //      Serial.print("0");
     }
 
     digitalWrite(HC595_SRCLK, HIGH);
@@ -289,4 +335,6 @@ void set_hc595(bool _dat0, byte _dat1) {
 
   digitalWrite(HC595_RCLK, HIGH);
   digitalWrite(HC595_RCLK, LOW);
+
+  //  Serial.println();
 }

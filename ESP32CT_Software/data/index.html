@@ -181,12 +181,6 @@
                 document.getElementById('log_text').textContent = "";
             }
             
-            //function update_curr_pin(val) {
-            //    document.getElementById('pin_curr').textContent = "Current pin: "
-            //        + val.toString();
-            //    current_update_status = 1;
-            //}
-            
             function update_curr_hold_pin(curr_val, next_val) {
                 document.getElementById('pin_curr').textContent = "Current pin: "
                     + curr_val.toString() + " (Hold: " + next_val.toString() + ")";
@@ -197,11 +191,6 @@
                 document.getElementById('pin_curr').textContent = "Held pin: " + val.toString();
                 current_update_status = update_status_held;
             }
-            
-            //function update_next_pin(val) {
-            //    document.getElementById('pin_curr').textContent = "Next pin: " + val.toString();
-            //    current_update_status = update_status_next;
-            //}
             
             function update_complete_pin() {
                 document.getElementById('pin_curr').textContent = "All (" +
@@ -462,12 +451,7 @@
                 };
 
                 img1.src = imgSrc;
-                
-                //ctx.clearRect(0, 0, canvas2.width, canvas2.height);
-                //ctx.stroke();
             }
-            
-            // graphRefresh2('panel_disabled'); //load image
             
             function timedRefresh(timeoutPeriod) {
                 setTimeout("location.reload(true);",timeoutPeriod);
@@ -683,10 +667,7 @@
                     const fr = new FileReader();
 
                     fr.addEventListener("load", e => {
-                        //console.log(e.target.result, JSON.parse(fr.result))
                         JSONobj=JSON.parse(fr.result);
-                        
-                        //alert(JSONobj.remote_data_x[0][0]);
                         
                         document.getElementById('filedesc').value = JSONobj.file_desc;
                         
@@ -694,8 +675,6 @@
                             current_pin1 = 1;       
                             update_curr_hold_pin(current_pin1, hold_pin1);
                         }
-
-                        //alert(JSONobj.file_desc); 
                         
                         let strDataURI = JSONobj.image;
                         
@@ -714,8 +693,6 @@
                         point2_x2 = JSONobj.data_x;
                         point2_y2 = JSONobj.data_y;
                         
-                        //alert(point2_x2[0]);
-                        
                         pin_count1 = point2_x2.length;
                         
                         document.getElementById('pin_qty').value = point2_x2.length;
@@ -727,8 +704,6 @@
                         document.getElementById("btn_prev").disabled = false;
                         document.getElementById("btn_next").disabled = false;
                     });
-
-                    //fr.readAsText(blob);
                     
                     fr.readAsText(this.files[0]);
                     
@@ -767,8 +742,6 @@
                 
                 let imageURI = canvas2.toDataURL("image/png"); // toDataURL
                 
-                //alert(imageURI);
-                
                 let file_desc1 = document.getElementById('filedesc').value;
                 let image_filename1 = document.getElementById('lblLoadImage').textContent;
                 
@@ -780,8 +753,6 @@
                 data_1["max_pins"] = max_pin_count1;
                 data_1["data_x"] = point2_x2;
                 data_1["data_y"] = point2_y2;
-                    
-                //alert(imageURI);
                 
                 let body1 = document.body;
                 let json_payload = JSON.stringify(data_1, null, 1); //.replace(/(\r\n|\n|\r)/gm, "");
@@ -796,7 +767,6 @@
             }
             
             function testResults6 (form) { // hold
-                //if ((current_pin1 > 0) | (file_edit == true)) {
                     clear_log1();
                     
                     flag_capture_data = true;
@@ -855,8 +825,6 @@
                         point2_x2.push(str_x);
                         point2_y2.push(str_y);
                     }
-                    
-                    //alert(point2_y2.length);
                                                             
                     show_file_pin = true;
                     
@@ -864,11 +832,6 @@
                     
                     timer1.reset();
                     timer1.resume();
-                    
-                    
-                //} else {
-                //    show_file_pin = false;
-                //}
             }
 
             function testResults7 (form) { // clear log
@@ -897,8 +860,6 @@
                       img.src = imgSrc;
                     
                     document.getElementById('lblLoadImage').textContent = this.files[0].name;
-                    
-                    //const path = (window.URL || window.webkitURL).createObjectURL(this.files[0]);
                 };
                 input.click();
             }
@@ -1023,7 +984,6 @@
             }
             
             var timer1 = new Timer(function () {
-                //console.log("Timeout!");
                 show_file_pin = false;
 
                 if (current_pin1 < max_pin_count1) {
