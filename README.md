@@ -37,6 +37,10 @@ Data upload to ESP32 (Webserver):
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_upload.png)
 
+ESP32 board:
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_board.png)
+
 ------------
 
 ## Licence
