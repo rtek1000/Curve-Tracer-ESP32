@@ -16,7 +16,7 @@ Note: Work in progress, just demonstrative, not functional, sorry.
 - Automatic/Manual test path selection
 - Multiple test impedances (x1, x2, x4, x8)
 
-HTML_page:
+HTML_page (ESP32 Webserver):
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/HTML_page.png)
 
