@@ -12,7 +12,7 @@ Note: Work in progress, just demonstrative, not functional, sorry.
 ### Software
 
 - Visual interface via browser (HTML page)
-- IP address location via mDNS (esp32ct.local)
+- IP address location via mDNS ([esp32ct.local](http://esp32ct.local/))
 - Automatic/Manual test path selection
 - Multiple test impedances (x1, x2, x4, x8)
 
