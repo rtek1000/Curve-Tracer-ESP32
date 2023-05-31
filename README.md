@@ -6,6 +6,7 @@ Operation based on this project: [Curve Tracer ATmega328](https://github.com/rte
 ### Software
 
 - Visual interface via browser (HTML page)
+- IP address location via mDNS (esp32ct.local)
 - Automatic/Manual test path selection
 - Multiple test impedances (x1, x2, x4, x8)
 
