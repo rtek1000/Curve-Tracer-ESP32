@@ -39,7 +39,7 @@ Uploading the Data Folder to the ESP32 (Webserver):
 
 ESP32 board:
 
-![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_board.png)
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_Dev_Module.png)
 
 ------------
 
