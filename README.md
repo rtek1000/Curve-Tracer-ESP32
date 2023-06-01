@@ -12,9 +12,13 @@ Note: Work in progress, just demonstrative, not functional, sorry.
 ### Software
 
 - Visual interface via browser (HTML page)
-- IP address location via mDNS (esp32ct.local)
+- IP address location via mDNS ([esp32ct.local](http://esp32ct.local/))
 - Automatic/Manual test path selection
 - Multiple test impedances (x1, x2, x4, x8)
+
+HTML_page (ESP32 Webserver):
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/HTML_page.png)
 
 ### Hardware
 
@@ -28,6 +32,14 @@ Main:
 Expansion of probes:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_pg2.png)
+
+Uploading the Data Folder to the ESP32 (Webserver):
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_upload.png)
+
+ESP32 board:
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_board.png)
 
 ------------
 
