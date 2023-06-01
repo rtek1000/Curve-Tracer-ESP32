@@ -41,7 +41,7 @@ Upload procedure:
 
 WiFi network configuration:
 - Log into the "AutoConnectAP" network, password is "password" (Active time is only 30 seconds)
-- Open IP "192.168.4.1" (http://192.168.4.1) in internet browser
+- Open IP "192.168.4.1" (http://192.168.4.1) in internet browser (Do not use https://)
 - Click "Configure WiFi" button
 - Select your existing WiFi network
 - Enter your WiFi network password
