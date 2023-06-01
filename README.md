@@ -33,6 +33,22 @@ Expansion of probes:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_pg2.png)
 
+Upload procedure:
+- Select "ESP32 Dev Module" board
+- Select the "Erase All Flash Before Sketch Upload" (ENABLED) option
+- Click the "Sketch (Menu)">""Upload (Ctrl+U)" button
+- Click the "Tools (Menu)">"Esp32 Sketch Data Upload" button
+
+WiFi network configuration:
+- Log into the "AutoConnectAP" network, password is "password" (Active time is only 30 seconds)
+- Open IP "192.168.4.1" (http://192.168.4.1) in internet browser
+- Click "Configure WiFi" button
+- Select your existing WiFi network
+- Enter your WiFi network password
+- Click the "Save" button
+- Wait a while for the ESP32 to restart and log into the network, this can be monitored in the Serial Monitor of the Arduino IDE "Tools (Menu)">"Serial Monitor (Ctrl+Shift+M"
+- Open "esp32ct.local" (http://esp32ct.local) address in internet browser. You can use the IP address entered in the Serial Monitor, or in an IP locator with mDNS support (Mobile devices may need an IP locator with mDNS support)
+
 ESP32 board:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_Dev_Module.png)
