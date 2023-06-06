@@ -57,6 +57,22 @@ Uploading the Data Folder to the ESP32 (Webserver):
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_folder_upload.png)
 
+#### PCB
+
+IC 74HC4067 can be found under the code HP4067, and there is also a board already assembled with this IC:
+!img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/HP4067_board.png)
+
+Using this HP4067 PCB board can be simpler to design:
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/ESP32_Curve_Tracer_4067mod_F1.png)
+
+As there are empty spaces between the modules, the ESP32 and other components can be on the other side of the PCB:
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/ESP32_Curve_Tracer_4067mod_F2.png)
+
+Notes:
+- In this case, using HP4067 boards, each 74HC4067MODx2 module is made up of 2 HP4067 boards and the 16 zener diodes, present in the complete schematic.
+
+- On the 74HC4067MODx2 module, pins C0 to C15 are interconnected, as well as pins VCC, GND, EN and S0 to S3. Only the SIG pins are separated, and on the PCB they appear with pins 8 and 9.
+
 ------------
 
 ## Licence
