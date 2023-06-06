@@ -73,6 +73,8 @@ Notes:
 
 - On the 74HC4067MODx2 module, pins C0 to C15 are interconnected, as well as pins VCC, GND, EN and S0 to S3. Only the SIG pins are separated, and on the PCB they appear with pins 8 and 9.
 
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/HP4067_Sig.png)
+
 ------------
 
 ## Licence
