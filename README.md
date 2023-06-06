@@ -60,7 +60,7 @@ Uploading the Data Folder to the ESP32 (Webserver):
 #### PCB
 
 IC 74HC4067 can be found under the code HP4067, and there is also a board already assembled with this IC:
-!img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/HP4067_board.png)
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/HP4067_board.png)
 
 Using this HP4067 PCB board can be simpler to design:
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_4067mod/ESP32_Curve_Tracer_4067mod_F1.png)
