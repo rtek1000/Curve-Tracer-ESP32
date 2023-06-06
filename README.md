@@ -36,8 +36,8 @@ Expansion of probes:
 Upload procedure:
 - Select "ESP32 Dev Module" board
 - Select the "Erase All Flash Before Sketch Upload" (ENABLED) option
-- Click the "Sketch (Menu)">""Upload (Ctrl+U)" button
-- Click the "Tools (Menu)">"Esp32 Sketch Data Upload" button
+- Click the "Sketch (Menu)" > "Upload (Ctrl+U)" button
+- Click the "Tools (Menu)" > "Esp32 Sketch Data Upload" button
 
 WiFi network configuration:
 - Log into the "AutoConnectAP" network, password is "password" (Active time is only 30 seconds)
