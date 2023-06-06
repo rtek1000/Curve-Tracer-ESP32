@@ -46,7 +46,7 @@ WiFi network configuration:
 - Select your existing WiFi network
 - Enter your WiFi network password
 - Click the "Save" button
-- Wait a while for the ESP32 to restart and log into the network, this can be monitored in the Serial Monitor of the Arduino IDE "Tools (Menu)">"Serial Monitor (Ctrl+Shift+M)"
+- Wait a while for the ESP32 to restart and log into the network, this can be monitored in the Serial Monitor of the Arduino IDE "Tools (Menu)" > "Serial Monitor (Ctrl+Shift+M)"
 - Open "esp32ct.local" (http://esp32ct.local) address in internet browser. You can use the IP address entered in the Serial Monitor, or in an IP locator with mDNS support (Mobile devices may need an [IP locator](https://play.google.com/store/apps/details?id=com.mdns_discovery.app&hl=en&gl=US) with mDNS support)
 
 ESP32 board:
