@@ -36,6 +36,14 @@ WiFi network configuration:
 - Wait a while for the ESP32 to restart and log into the network, this can be monitored in the Serial Monitor of the Arduino IDE "Tools (Menu)" > "Serial Monitor (Ctrl+Shift+M)"
 - Open "esp32ct.local" (http://esp32ct.local) address in internet browser. You can use the IP address entered in the Serial Monitor, or in an IP locator with mDNS support (Mobile devices may need an [IP locator](https://play.google.com/store/apps/details?id=com.mdns_discovery.app&hl=en&gl=US) with mDNS support)
 
+ESP32 board:
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_Dev_Module.png)
+
+Uploading the Data Folder to the ESP32 (Webserver):
+
+![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_folder_upload.png)
+
 ### Hardware
 
 - Total 160 test tracks for each channel (Ch1: 160 probes, Ch2: 160 probes)
@@ -48,14 +56,6 @@ Main:
 Expansion of probes:
 
 ![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/ESP32CT_Hardware/ESP32_Curve_Tracer_pg2.png)
-
-ESP32 board:
-
-![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/ESP32_Dev_Module.png)
-
-Uploading the Data Folder to the ESP32 (Webserver):
-
-![img](https://raw.githubusercontent.com/rtek1000/Curve-Tracer-ESP32/main/Docs/Data_folder_upload.png)
 
 #### PCB
 
